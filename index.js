@@ -16,12 +16,11 @@ let pubDateArr = [];
 const fetchOptions = {
     uri: 'http://sinkan.net/?action_rss=true&uid=28644&mode=schedule&key=15b8d46e062b05adf08bcf457b0eb5c3',
     transform: function (body) {
-        let $ = cheerio.load(body);
-        $("channel > item").each(function() {
+        let $ = cheerio.load(body ,{xmlMode : true});
+        $("item > title").each(function() {
 			  let productInfo = $(this);
 			  let productInfoText = productInfo.text();
 			  pubDateArr.push(productInfoText);
-
 		 });
     }
 };
@@ -103,8 +102,9 @@ exports.handler = (event, context, callback) => {
     rp(fetchOptions)
     .then(function ($) {
         processEventWithHookUrl (event, callback);
+        console.log(pubDateArr);
     })
     .catch(function (err) {
-        console.log("Something error");
+        console.log("Error Fetch API");
     });
 };
