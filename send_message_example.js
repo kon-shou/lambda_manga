@@ -1,30 +1,13 @@
-"use strict";
-
 const AWS = require('aws-sdk');
 const url = require('url');
 const https = require('https');
-const cheerio = require('cheerio');
-const rp = require('request-promise');
 
 // The base-64 encoded, encrypted key (CiphertextBlob) stored in the kmsEncryptedHookUrl environment variable
 const kmsEncryptedHookUrl = process.env.kmsEncryptedHookUrl;
 // The Slack channel to send a message to stored in the slackChannel environment variable
 const slackChannel = process.env.slackChannel;
 let hookUrl;
-let pubDateArr = [];
 
-const options = {
-    uri: 'http://sinkan.net/?action_rss=true&uid=28644&mode=schedule&key=15b8d46e062b05adf08bcf457b0eb5c3',
-    transform: function (body) {
-        let $ = cheerio.load(body);
-        $("channel > item").each(function() { 
-			  let productInfo = $(this);
-			  let productInfoText = productInfo.text();
-			  pubDateArr.push(productInfoText);
-			  
-		 });
-    }
-};
 
 function postMessage(message, callback) {
     const body = JSON.stringify(message);
@@ -56,10 +39,16 @@ function postMessage(message, callback) {
 }
 
 function processEvent(event, callback) {
+    const message = JSON.parse(event.Records[0].Sns.Message);
+
+    const alarmName = message.AlarmName;
+    //var oldState = message.OldStateValue;
+    const newState = message.NewStateValue;
+    const reason = message.NewStateReason;
 
     const slackMessage = {
         channel: slackChannel,
-        text: `${pubDateArr}`,
+        text: `${alarmName} state is now ${newState}: ${reason}`,
     };
 
     postMessage(slackMessage, (response) => {
@@ -77,7 +66,7 @@ function processEvent(event, callback) {
 }
 
 
-function processEventWithHookUrl (event, callback) {
+exports.handler = (event, context, callback) => {
     if (hookUrl) {
         // Container reuse, simply process the event with the key in memory
         processEvent(event, callback);
@@ -97,14 +86,4 @@ function processEventWithHookUrl (event, callback) {
     } else {
         callback('Hook URL has not been set.');
     }
-}
-
-exports.handler = (event, context, callback) => {
-    rp(options)
-    .then(function ($) {
-        processEventWithHookUrl (event, callback);
-    })
-    .catch(function (err) {
-        console.log("Something error");
-    });
 };
