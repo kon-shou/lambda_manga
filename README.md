@@ -1,6 +1,6 @@
 # What is this script?
 
-Fetch Publishdate from 新刊ネット (http://sinkan.net/) and send your slack at scheduled day. 
+Fetch Publishdate from 新刊ネット (http://sinkan.net/) and send your slack on scheduled day.
 
 # Test the script
 
@@ -19,4 +19,6 @@ Fetch Publishdate from 新刊ネット (http://sinkan.net/) and send your slack 
 
 3) Chose "Upload a .zip file" at Code entry type and upload zip file.
 
-4) Configure schedule event and Finished!!!
+4) Configure schedule event
+
+5) Finished!!!
