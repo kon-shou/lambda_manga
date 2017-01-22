@@ -10,6 +10,7 @@
     "cheerio": "^0.22.0",
     "express": "~3.2.4",
     "https": "^1.0.0",
+    "request": "^2.79.0",
     "request-promise": "^4.1.1",
     "socket.io": "~0.9.14",
     "then-request": "^2.2.0",

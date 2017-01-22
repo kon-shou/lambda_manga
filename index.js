@@ -13,29 +13,29 @@ const slackChannel = process.env.slackChannel;
 let hookUrl;
 let pubDateArr = [];
 
-const options = {
+const fetchOptions = {
     uri: 'http://sinkan.net/?action_rss=true&uid=28644&mode=schedule&key=15b8d46e062b05adf08bcf457b0eb5c3',
     transform: function (body) {
         let $ = cheerio.load(body);
-        $("channel > item").each(function() { 
+        $("channel > item").each(function() {
 			  let productInfo = $(this);
 			  let productInfoText = productInfo.text();
 			  pubDateArr.push(productInfoText);
-			  
+
 		 });
     }
 };
 
 function postMessage(message, callback) {
     const body = JSON.stringify(message);
-    const options = url.parse(hookUrl);
-    options.method = 'POST';
-    options.headers = {
+    const Sendoptions = url.parse(hookUrl);
+    Sendoptions.method = 'POST';
+    Sendoptions.headers = {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(body),
     };
 
-    const postReq = https.request(options, (res) => {
+    const postReq = https.request(Sendoptions, (res) => {
         const chunks = [];
         res.setEncoding('utf8');
         res.on('data', (chunk) => chunks.push(chunk));
@@ -58,9 +58,9 @@ function postMessage(message, callback) {
 function processEvent(event, callback) {
 
     const slackMessage = {
-        channel: slackChannel,
-        text: `${pubDateArr}`,
+        text: `${pubDateArr[0]}`,
     };
+    console.log(slackMessage);
 
     postMessage(slackMessage, (response) => {
         if (response.statusCode < 400) {
@@ -91,7 +91,7 @@ function processEventWithHookUrl (event, callback) {
                 console.log('Decrypt error:', err);
                 return callback(err);
             }
-            hookUrl = `https://${data.Plaintext.toString('ascii')}`;
+            hookUrl = data.Plaintext.toString('ascii');
             processEvent(event, callback);
         });
     } else {
@@ -100,7 +100,7 @@ function processEventWithHookUrl (event, callback) {
 }
 
 exports.handler = (event, context, callback) => {
-    rp(options)
+    rp(fetchOptions)
     .then(function ($) {
         processEventWithHookUrl (event, callback);
     })
