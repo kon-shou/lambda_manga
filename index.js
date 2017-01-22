@@ -13,8 +13,6 @@ const slackChannel = process.env.slackChannel;
 let hookUrl;
 let pubTitleArr = [];
 let pubLinkArr = [];
-let pubLink = [];
-let pubDate = [];
 let slackMessage;
 
 const fetchOptions = {
@@ -60,13 +58,14 @@ function postMessage(message, callback) {
 }
 
 function processEvent(event, callback) {
-  for (let i = 0; i < pubTitleArr.length; i++) {
-    slackMessage = {
+  if (pubTitleArr.length > 0) {
+    for (let i = 0; i < pubTitleArr.length; i++) {
+      slackMessage = {
         text: `${pubTitleArr[i]}\n${pubLinkArr[i]}`,
-    };
-    console.log(slackMessage);
+      };
+      console.log(slackMessage);
 
-    postMessage(slackMessage, (response) => {
+      postMessage(slackMessage, (response) => {
         if (response.statusCode < 400) {
             console.info('Message posted successfully');
             callback(null);
@@ -77,7 +76,10 @@ function processEvent(event, callback) {
             // Let Lambda retry
             callback(`Server error when processing message: ${response.statusCode} - ${response.statusMessage}`);
         }
-    });
+      });
+    }
+  } else {
+    callback(`本日発売の漫画はありません`);
   }
 }
 
