@@ -15,6 +15,7 @@ let pubTitleArr = [];
 let pubLinkArr = [];
 let pubLink = [];
 let pubDate = [];
+let slackMessage;
 
 const fetchOptions = {
     uri: 'http://sinkan.net/?action_rss=true&uid=28644&mode=schedule&key=15b8d46e062b05adf08bcf457b0eb5c3',
@@ -59,9 +60,9 @@ function postMessage(message, callback) {
 }
 
 function processEvent(event, callback) {
-  for (let i = 0; i < pubTitleArr.length; i++)
-    const slackMessage = {
-        text: `${pubTitle[i]}\n${pubLink[i]}`,
+  for (let i = 0; i < pubTitleArr.length; i++) {
+    slackMessage = {
+        text: `${pubTitleArr[i]}\n${pubLinkArr[i]}`,
     };
     console.log(slackMessage);
 
@@ -77,6 +78,7 @@ function processEvent(event, callback) {
             callback(`Server error when processing message: ${response.statusCode} - ${response.statusMessage}`);
         }
     });
+  }
 }
 
 
