@@ -59,9 +59,9 @@ function postMessage(message, callback) {
 }
 
 function processEvent(event, callback) {
-
+  if (pubDateArr===null) {
     const slackMessage = {
-        text: `${pubDateArr[0]}`,
+        text: `${pubDateArr}`,
     };
     console.log(slackMessage);
 
@@ -77,6 +77,9 @@ function processEvent(event, callback) {
             callback(`Server error when processing message: ${response.statusCode} - ${response.statusMessage}`);
         }
     });
+  } else {
+    callback(`本日発売の漫画はありません`);
+  }
 }
 
 
