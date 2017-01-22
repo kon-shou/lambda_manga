@@ -1,10 +1,10 @@
 {
-  "name": "chat-example",
+  "name": "Lambda_manga",
   "version": "0.0.0",
-  "description": "A chat example to showcase how to use `socket.io` with a static `express` server with `async` for control flow.",
-  "main": "server.js",
+  "description": "",
+  "main": "index.js",
   "repository": "",
-  "author": "Mostafa Eweda <mo.eweda@gmail.com>",
+  "author": "kon_shou <kondo_kanri@yahoo.co.jp>",
   "dependencies": {
     "aws-sdk": "^2.7.26",
     "cheerio": "^0.22.0",

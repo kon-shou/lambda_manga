@@ -17,10 +17,14 @@ const fetchOptions = {
     uri: 'http://sinkan.net/?action_rss=true&uid=28644&mode=schedule&key=15b8d46e062b05adf08bcf457b0eb5c3',
     transform: function (body) {
         let $ = cheerio.load(body ,{xmlMode : true});
-        $("item > title").each(function() {
+        $("item > pubDate").each(function() {
 			  let productInfo = $(this);
 			  let productInfoText = productInfo.text();
-			  pubDateArr.push(productInfoText);
+        let pubDate = new Date(productInfoText);
+        let today = new Date();
+        if (pubDate.getDate() === today.getDate()) {
+          pubDateArr.push(productInfoText);
+        };
 		 });
     }
 };
