@@ -11,21 +11,22 @@ const kmsEncryptedHookUrl = process.env.kmsEncryptedHookUrl;
 // The Slack channel to send a message to stored in the slackChannel environment variable
 const slackChannel = process.env.slackChannel;
 let hookUrl;
-let pubDateArr = [];
+let pubTitleArr = [];
+let pubLinkArr = [];
+let pubLink = [];
+let pubDate = [];
+let slackMessage;
 
 const fetchOptions = {
     uri: 'http://sinkan.net/?action_rss=true&uid=28644&mode=schedule&key=15b8d46e062b05adf08bcf457b0eb5c3',
     transform: function (body) {
         let $ = cheerio.load(body ,{xmlMode : true});
-        $("item > pubDate").each(function() {
-			  let productInfo = $(this);
-			  let productInfoText = productInfo.text();
-        let pubDate = new Date(productInfoText);
-        let today = new Date();
-        if (pubDate.getDate() === today.getDate()) {
-          pubDateArr.push(productInfoText);
-        };
-		 });
+        $("channel > item").each(function(i) {
+			    pubTitleArr[i] = $(this).find("title").text();
+          pubLinkArr[i] = $(this).find("link").text();
+          console.log(pubTitleArr);
+          console.log(pubLinkArr);
+		    });
     }
 };
 
@@ -59,9 +60,9 @@ function postMessage(message, callback) {
 }
 
 function processEvent(event, callback) {
-  if (pubDateArr===null) {
-    const slackMessage = {
-        text: `${pubDateArr}`,
+  for (let i = 0; i < pubTitleArr.length; i++) {
+    slackMessage = {
+        text: `${pubTitleArr[i]}\n${pubLinkArr[i]}`,
     };
     console.log(slackMessage);
 
@@ -77,8 +78,6 @@ function processEvent(event, callback) {
             callback(`Server error when processing message: ${response.statusCode} - ${response.statusMessage}`);
         }
     });
-  } else {
-    callback(`本日発売の漫画はありません`);
   }
 }
 
@@ -109,7 +108,6 @@ exports.handler = (event, context, callback) => {
     rp(fetchOptions)
     .then(function ($) {
         processEventWithHookUrl (event, callback);
-        console.log(pubDateArr);
     })
     .catch(function (err) {
         console.log("Error Fetch API");
